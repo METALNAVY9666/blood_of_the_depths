@@ -21,11 +21,39 @@ public class PlayerMovement : MonoBehaviour
 	}
 	void Update()
 	{
-		horizontal = Input.GetAxisRaw("horizontal");
+		horizontal = Input.GetAxisRaw("Horizontal");
+		CheckJump();
+		CheckFlip();
 
         }
 	private void FixedUpdate()
 	{
-		rb.velocity = new 
+		rb.velocity = new Vector2(horizontal * speed, rb.velocity.y); 
+	}
+	private	bool isGrounded()
+	{
+		return Physics2D.OverlapCircle(ground_check.position, 0.2f, ground_layer);
+	}
+	private void CheckFlip()
+	{
+		if ((is_facing_right && horizontal < 0) || (!is_facing_right && horizontal > 0))
+		{
+			is_facing_right = !is_facing_right;
+			Vector3 localScale = transform.localScale;
+			localScale.x *= -1f;
+			transform.localScale = localScale;
+		}
+	}
+	private void CheckJump()
+	{
+		if (isGrounded() && Input.GetButtonDown("Jump"))
+		{
+			rb.velocity = new Vector2(rb.velocity.x, jump_power);
+		}
+
+		if (Input.GetButtonUp("Jump") && rb.velocity.y > 0f)
+		{
+			rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
+		}
 	}
 }
